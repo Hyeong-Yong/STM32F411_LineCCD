@@ -6,7 +6,7 @@
  */
 
 #include "usb.h"
-//#include "usb_device.h"
+#include "usb_device.h"
 
 #ifdef _USE_HW_USB
 

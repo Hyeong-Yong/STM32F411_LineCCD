@@ -74,7 +74,9 @@ void ledToggle(uint8_t ch)
   HAL_GPIO_TogglePin(led_tbl[ch].port, led_tbl[ch].pin);
   }
 
+
 #ifdef _USE_HW_CLI
+
 void cliLED(cli_args_t *args)
 {
   bool ret = false;
@@ -101,7 +103,7 @@ void cliLED(cli_args_t *args)
               ledToggle(led_ch);
             }
         }
-      return ret=true;
+      ret=true;
     }
 
   if (ret != true)

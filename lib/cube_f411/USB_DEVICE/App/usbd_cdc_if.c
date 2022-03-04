@@ -23,6 +23,111 @@
 
 /* USER CODE BEGIN INCLUDE */
 
+USBD_CDC_LineCodingTypeDef LineCoding =
+    {
+        115200,
+        0x00,
+        0x00,
+        0x08
+    };
+
+uint32_t  rx_in=0;
+uint32_t  rx_out=0;
+uint32_t  rx_len = 512;
+uint8_t   rx_buf[512];
+bool      rx_full = false;
+
+uint32_t cdcAvailable(void) //ring buffer
+{
+  uint32_t ret;
+
+  ret = (rx_in - rx_out) % rx_len;
+  return ret;
+}
+
+uint8_t cdcRead(void)
+{
+  uint8_t ret;
+
+  ret = rx_buf[rx_out];
+
+  if (rx_out != rx_in)
+    {
+      rx_out = (rx_out + 1) % rx_len;
+    }
+
+  return ret;
+}
+
+uint8_t cdcDataIn(uint8_t rx_data)
+{
+
+  uint32_t next_rx_in;
+
+  rx_buf[rx_in]= rx_data;
+
+  next_rx_in =(rx_in +1)% rx_len;
+
+  if (next_rx_in != rx_out)
+    {
+      rx_in = next_rx_in;
+    }
+  return 0;
+}
+
+uint8_t cdcWrite(uint8_t *p_data, uint32_t length)
+{
+  uint32_t pre_time;
+  uint8_t ret;
+  pre_time = millis();
+  while (1)
+    {
+      ret= CDC_Transmit_FS(p_data, length);
+      if (ret == USBD_OK)
+        {
+          return length;
+        }
+      else if (ret == USBD_FAIL)
+        {
+          return 0;
+        }
+
+      if (millis()- pre_time  >=100)
+        {
+          break;
+        }
+    }
+
+  return 0;
+}
+
+uint32_t cdcGetBaud(void)
+{
+  return LineCoding.bitrate;
+}
+
+uint8_t USBD_CDC_SOF(struct _USBD_HandleTypeDef *pdev)
+{
+  if (rx_full == true)
+    {
+
+      uint32_t buf_len;
+
+      buf_len = ( rx_len - cdcAvailable() ) -1; //-1 : ?ì∏?àò ?ûà?äî ?ïúÏπ∏ÏùÑ ÎπÑÏõå?ÜìÍ∏?
+      if (buf_len >= USB_FS_MAX_PACKET_SIZE)
+        {
+          USBD_CDC_ReceivePacket(pdev);
+          rx_full = false;
+        }
+      else
+        {
+          rx_full = true;
+        }
+
+    }
+
+  return 0;
+}
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -220,11 +325,23 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   /* 6      | bDataBits  |   1   | Number Data bits (5, 6, 7, 8 or 16).          */
   /*******************************************************************************/
     case CDC_SET_LINE_CODING:
-
+      LineCoding.bitrate    = (uint32_t)(pbuf[0]);
+      LineCoding.bitrate   |= (uint32_t)(pbuf[1]<<8);
+      LineCoding.bitrate   |= (uint32_t)(pbuf[2]<<16);
+      LineCoding.bitrate   |= (uint32_t)(pbuf[3]<<24);
+      LineCoding.format     = pbuf[4];
+      LineCoding.paritytype = pbuf[5];
+      LineCoding.datatype   = pbuf[6];
     break;
 
     case CDC_GET_LINE_CODING:
-
+      pbuf[0] = (uint8_t)(LineCoding.bitrate);
+      pbuf[1] = (uint8_t)(LineCoding.bitrate>>8);
+      pbuf[2] = (uint8_t)(LineCoding.bitrate>>16);
+      pbuf[3] = (uint8_t)(LineCoding.bitrate>>24);
+      pbuf[4] = LineCoding.format;
+      pbuf[5] = LineCoding.paritytype;
+      pbuf[6] = LineCoding.datatype;
     break;
 
     case CDC_SET_CONTROL_LINE_STATE:
@@ -261,8 +378,29 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
 static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
-  USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
-  USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+
+
+
+  for (int i=0; i<*Len ; i++)
+    {
+      cdcDataIn(Buf[i]);
+    }
+
+  uint32_t buf_len;
+
+  buf_len = ( rx_len - cdcAvailable() ) -1; //-1 : ?ì∏?àò ?ûà?äî ?ïúÏπ∏ÏùÑ ÎπÑÏõå?ÜìÍ∏?
+  if (buf_len >= USB_FS_MAX_PACKET_SIZE)
+    {
+      //?ã§?ùå?ç∞?ù¥?Ñ∞?èÑ Î≥¥ÎÇ¥Ï§?
+      USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
+      USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+    }
+  else
+    {
+      //Î≤ÑÌçºÍ∞? ÍΩ? Ï∞®ÏÑú Î∞?Î¶¨Í≥† ?ûà?ã§ Ï¶?, Î≤ÑÌçº?ö©?üâ Î∂?Ï°±Ìïò?ãà Í∏∞Îã§?†§?ùº.
+      rx_full = true;
+    }
+
   return (USBD_OK);
   /* USER CODE END 6 */
 }

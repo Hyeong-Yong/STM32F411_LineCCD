@@ -10,11 +10,9 @@
 
 #include "hw_def.h"
 
-#ifdef _USB_HW_USB
+#ifdef _USE_HW_USB
 
 bool usbInit(void);
-
-
 
 #endif
 
