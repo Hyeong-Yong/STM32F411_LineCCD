@@ -17,6 +17,7 @@ void hwInit(void)
   uartInit();
   buttonInit();
   gpioInit();
+  sdInit();
 }
 
 

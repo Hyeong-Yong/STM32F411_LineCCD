@@ -161,11 +161,12 @@ uint32_t uartPrintf(uint8_t ch, char*fmt, ...)
   va_list args;
   int len;
   uint32_t ret;
+
   va_start(args, fmt);
 
 
   len = vsnprintf(buf, 256, fmt, args);
-  ret=uartWrite(ch, (uint8_t *)buf, len);
+  ret = uartWrite(ch, (uint8_t *)buf, len);
 
 
   va_end(args);
