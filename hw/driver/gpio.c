@@ -45,7 +45,7 @@ for (int i=0; i<GPIO_MAX_CH; i++)
 
 
 #ifdef _USE_HW_CLI
-cliAdd("gpio" , cliGpio);
+cliAdd("gpio", cliGpio);
 #endif
 
 return ret;
@@ -139,7 +139,7 @@ void gpioPinToggle(uint8_t ch)
 
 static void cliGpio(cli_args_t *args)
 {
-  bool ret= true;
+  bool ret= false;
 
   if (args->argc == 1 && args->isStr(0, "show") ==true)
     {

@@ -9,6 +9,7 @@
 #include "gpio.h"
 #include "cli.h"
 
+#ifdef _USE_HW_SD
 
 
 static bool is_init = false;
@@ -172,7 +173,6 @@ bool sdReadBlocks(uint32_t block_addr, uint8_t *p_data, uint32_t num_of_blocks, 
   is_rx_done = false;
   if(HAL_SD_ReadBlocks_DMA(&hsd, (uint8_t *)p_data, block_addr, num_of_blocks) == HAL_OK)
   {
-
     pre_time = millis();
     while(is_rx_done == false)
     {
@@ -450,4 +450,7 @@ void cliSd(cli_args_t *args)
     }
   }
 }
+
+#endif
+
 #endif
