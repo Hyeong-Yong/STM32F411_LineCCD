@@ -12,6 +12,7 @@
 
 #ifdef _USE_HW_CDC
 bool     cdcInit(void);
+bool	 cdcIsInit(void);
 uint32_t cdcAvailable(void);//ring buffer
 uint8_t  cdcRead(void);
 uint8_t  cdcDataIn(uint8_t rx_data);

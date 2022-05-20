@@ -16,6 +16,8 @@
 
 #define _USE_HW_USB
 #define _USE_HW_CDC
+#define	     HW_USE_CDC		1
+#define	     HW_USE_MSC		1
 
 #define _USE_HW_BUTTON
 #define	     HW_BUTTON_MAX_CH	1

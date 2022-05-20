@@ -20,7 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_cdc_if.h"
-
+#include "cdc.h"
 /* USER CODE BEGIN INCLUDE */
 
 USBD_CDC_LineCodingTypeDef LineCoding =
@@ -79,6 +79,12 @@ uint8_t cdcWrite(uint8_t *p_data, uint32_t length)
 {
   uint32_t pre_time;
   uint8_t ret;
+
+  if (cdcInit() != true)
+    {
+      return 0;
+    }
+
   pre_time = millis();
   while (1)
     {
@@ -113,7 +119,7 @@ uint8_t USBD_CDC_SOF(struct _USBD_HandleTypeDef *pdev)
 
       uint32_t buf_len;
 
-      buf_len = ( rx_len - cdcAvailable() ) -1; //-1 : ?“¸?ˆ˜ ?žˆ?Š” ?•œì¹¸ì„ ë¹„ì›Œ?†“ê¸?
+      buf_len = ( rx_len - cdcAvailable() ) -1; //-1 : ?ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½ì¹¸ì„ ë¹„ì›Œ?ï¿½ï¿½ï¿½?
       if (buf_len >= USB_FS_MAX_PACKET_SIZE)
         {
           USBD_CDC_ReceivePacket(pdev);
@@ -388,16 +394,16 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
 
   uint32_t buf_len;
 
-  buf_len = ( rx_len - cdcAvailable() ) -1; //-1 : ?“¸?ˆ˜ ?žˆ?Š” ?•œì¹¸ì„ ë¹„ì›Œ?†“ê¸?
+  buf_len = ( rx_len - cdcAvailable() ) -1; //-1 : ?ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½ì¹¸ì„ ë¹„ì›Œ?ï¿½ï¿½ï¿½?
   if (buf_len >= USB_FS_MAX_PACKET_SIZE)
     {
-      //?‹¤?Œ?°?´?„°?„ ë³´ë‚´ì¤?
+      //?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ ë³´ë‚´ï¿½?
       USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
       USBD_CDC_ReceivePacket(&hUsbDeviceFS);
     }
   else
     {
-      //ë²„í¼ê°? ê½? ì°¨ì„œ ë°?ë¦¬ê³  ?žˆ?‹¤ ì¦?, ë²„í¼?š©?Ÿ‰ ë¶?ì¡±í•˜?‹ˆ ê¸°ë‹¤? ¤?¼.
+      //ë²„í¼ï¿½? ï¿½? ì°¨ì„œ ï¿½?ë¦¬ê³  ?ï¿½ï¿½?ï¿½ï¿½ ï¿½?, ë²„í¼?ï¿½ï¿½?ï¿½ï¿½ ï¿½?ì¡±í•˜?ï¿½ï¿½ ê¸°ë‹¤?ï¿½ï¿½?ï¿½ï¿½.
       rx_full = true;
     }
 

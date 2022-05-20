@@ -7,7 +7,6 @@
 
 #include "bsp.h"
 //#include "uart.h"
-#include "usb_device.h"
 
 void SystemClock_Config(void);
 
