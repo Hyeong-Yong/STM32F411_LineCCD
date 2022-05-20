@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "dma.h"
+#include "fatfs.h"
 #include "sdio.h"
 #include "usb_device.h"
 #include "gpio.h"
@@ -90,6 +91,7 @@ int main(void)
   MX_USB_DEVICE_Init();
   MX_DMA_Init();
   MX_SDIO_SD_Init();
+  MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
