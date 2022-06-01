@@ -8,6 +8,7 @@
 #ifndef SRC_HW_HW_H_
 #define SRC_HW_HW_H_
 
+#include <pwm.h>
 #include "hw_def.h"
 
 
@@ -23,6 +24,10 @@
 #include "gpio.h"
 #include "sd.h"
 #include "fatfs.h"
+#include "spi.h"
+#include "adc.h"
+
+
 void hwInit(void);
 
 

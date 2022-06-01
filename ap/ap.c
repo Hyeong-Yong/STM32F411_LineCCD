@@ -7,12 +7,19 @@
 
 
 #include "ap.h"
-
+#include "lcd/st7735.h"
 
 
 void apInit(void)
 {
   cliOpen(_DEF_UART1, 57600);
+  st7735Init();
+  gpioPinWrite(1, _DEF_HIGH);
+  pwmStart(_DEF_PWM1);
+  pwmSycDelay(_DEF_PWM1, 1); //1 count => 500 ns
+  pwmStart(_DEF_PWM2);
+  pwmStart(_DEF_PWM3);
+  pwmStart(_DEF_PWM4);
 }
 
 void apMain(void)

@@ -18,10 +18,13 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
 #include "dma.h"
 #include "fatfs.h"
 #include "sdio.h"
-#include "usb_device.h"
+#include "spi.h"
+#include "tim.h"
+#include "usb_otg.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -88,10 +91,16 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_USB_DEVICE_Init();
   MX_DMA_Init();
   MX_SDIO_SD_Init();
   MX_FATFS_Init();
+  MX_SPI4_Init();
+  MX_USB_OTG_FS_PCD_Init();
+  MX_ADC1_Init();
+  MX_TIM2_Init();
+  MX_TIM3_Init();
+  MX_TIM4_Init();
+  MX_TIM5_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */

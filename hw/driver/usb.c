@@ -39,6 +39,10 @@ bool usbInit(void)
 void usbDeInit(void)
 {
 
+  if (is_init == true)
+  {
+    USBD_DeInit(&hUsbDeviceFS);
+  }
 }
 
 UsbMode usbGetMode(void)
@@ -103,7 +107,7 @@ bool usbBegin(UsbMode usb_mode)
     }
 #endif
 
-
+  is_init = ret;
 
   return ret;
 }

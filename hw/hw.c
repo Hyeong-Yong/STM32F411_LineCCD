@@ -17,6 +17,10 @@ void hwInit(void)
   uartInit();
   buttonInit();
   gpioInit();
+  spiInit();
+
+  adcInit();
+  pwmInit();
 
   if (sdInit()==true)
     {

@@ -39,6 +39,14 @@
 #define _DEF_OUTPUT_PULLUP	4
 #define _DEF_OUTPUT_PULLDOWN	5
 
+#define _DEF_SPI1	0
+
+#define _DEF_PWM1	0
+#define _DEF_PWM2	1
+#define _DEF_PWM3	2
+#define _DEF_PWM4	3
+
+
 #define _DEF_LOW		0
 #define _DEF_HIGH		1
 
