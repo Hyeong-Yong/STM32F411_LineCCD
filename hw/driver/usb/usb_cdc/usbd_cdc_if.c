@@ -98,7 +98,7 @@ uint8_t cdcWrite(uint8_t *p_data, uint32_t length)
           return 0;
         }
 
-      if (millis()- pre_time  >=100)
+      if (millis()- pre_time  >=200)
         {
           break;
         }

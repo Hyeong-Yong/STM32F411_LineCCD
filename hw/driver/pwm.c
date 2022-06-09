@@ -24,6 +24,8 @@ typedef struct
   bool is_pwmInit;
 } pwm_t;
 
+  uint32_t current_SH;
+  uint32_t current_ICG;
 
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
@@ -39,9 +41,9 @@ TIM_HandleTypeDef htim5;
 
 static pwm_t pwm_tbl[PWM_MAX_CH] =
     {
-	{&htim2, TIM_CHANNEL_1, 20000, 5*fM/1000000}, //  CHANNEL1 ICG (PA15) : pulse = 5 µs * fm
+	{&htim2, TIM_CHANNEL_1, 60000, 5*fM/1000000}, //  CHANNEL1 ICG (PA15) : pulse = 5 µs * fm
 	{&htim3, TIM_CHANNEL_1, (ABP_CLK/fM), (ABP_CLK/fM)/2}, 	 //  CHANNEL1 fM (PB4)
-	{&htim4, TIM_CHANNEL_3, 20, 2*fM/1000000},   //  CHANNEL3 SH (PB8)  : pulse = 2 µs * fm
+	{&htim4, TIM_CHANNEL_3, 20000, 2*fM/1000000},   //  CHANNEL3 SH (PB8)  : pulse = 2 µs * fm
 	{&htim5, TIM_CHANNEL_3, (4*ABP_CLK/fM), (ABP_CLK/fM)/2},    //  CHANNEL4 ADC (no output)
     };
 
@@ -57,6 +59,9 @@ bool pwmInit(void)
 
       pwmBegin(i, pwm_tbl[i].period);
     }
+
+  current_SH = 20000;
+  current_ICG = 60000;
 
 #ifdef _USE_HW_CLI
   cliAdd("CCD", cliCCD);
@@ -312,7 +317,8 @@ bool CCDset(uint32_t SH, uint32_t ICG)
   /* Stop   */
   pwmStop(_DEF_PWM1); // ICG
   pwmStop(_DEF_PWM3); // SH
-
+  current_SH = SH;
+  current_ICG = ICG;
   /*re-configuration*/
   pwmBegin(_DEF_PWM1, ICG);
   pwmBegin(_DEF_PWM3, SH);
@@ -323,6 +329,20 @@ bool CCDset(uint32_t SH, uint32_t ICG)
   pwmStart(_DEF_PWM3);
   return true;
 }
+
+void CCDSingleShot()
+{
+  pwmBegin(_DEF_PWM1, current_ICG);
+  pwmBegin(_DEF_PWM3, current_SH);
+
+  pwmStart(_DEF_PWM1);
+  pwmSycDelay(_DEF_PWM1, 1);
+  pwmStart(_DEF_PWM3);
+  delay(1);
+  pwmStop(_DEF_PWM1); // ICG
+  pwmStop(_DEF_PWM3); // SH
+}
+
 
 void pwmSycDelay(uint8_t ch, uint32_t delay)
 {
@@ -436,10 +456,18 @@ static void cliCCD(cli_args_t* args)
       ret = true;
     }
 
+  if (args->argc==1 && args->isStr(0, "single")==true)
+    {
+      CCDSingleShot();
+      cliPrintf("SingleShot");
+      ret = true;
+    }
+
 
   if(ret!=true)
     {
       cliPrintf("CCD set SH ICG\n");
+      cliPrintf("CCD single\n");
     }
 }
 

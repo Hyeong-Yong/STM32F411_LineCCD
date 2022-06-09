@@ -15,6 +15,7 @@
 #define ADC_MAX_CH HW_ADC_MAX_CH
 
 void adcInit(void);
+void ADCstart_DMA(uint8_t ch);
 
 #endif
 

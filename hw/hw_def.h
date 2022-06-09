@@ -31,7 +31,7 @@
 #define	     HW_BUTTON_MAX_CH	1
 
 #define _USE_HW_UART
-#define      HW_UART_MAX_CH	1
+#define      HW_UART_MAX_CH	2
 
 #define _USE_HW_CLI
 #define      HW_CLI_CMD_LIST_MAX 	16
@@ -50,7 +50,7 @@
 
 #define _USE_HW_ADC
 #define      HW_ADC_MAX_CH	1
-#define      ADC_BUF_SIZE	3694
+
 
 #define _USE_HW_FATFS
 

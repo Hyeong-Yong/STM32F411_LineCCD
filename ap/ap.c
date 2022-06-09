@@ -12,14 +12,16 @@
 
 void apInit(void)
 {
-  cliOpen(_DEF_UART1, 57600);
+  cliOpen(_DEF_UART2, 57600);
   st7735Init();
   gpioPinWrite(1, _DEF_HIGH);
-  pwmStart(_DEF_PWM1);
-  pwmSycDelay(_DEF_PWM1, 1); //1 count => 500 ns
+
+//  pwmStart(_DEF_PWM1);
+//  pwmSycDelay(_DEF_PWM1, 1); //1 count => 500 ns
   pwmStart(_DEF_PWM2);
-  pwmStart(_DEF_PWM3);
+//  pwmStart(_DEF_PWM3);
   pwmStart(_DEF_PWM4);
+//  ADCstart_DMA(_DEF_ADC1);
 }
 
 void apMain(void)
@@ -34,6 +36,7 @@ void apMain(void)
           pre_time=millis();
           ledToggle(_DEF_LED1);
         }
+
       cliMain();
     }
 }

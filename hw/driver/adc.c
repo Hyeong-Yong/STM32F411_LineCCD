@@ -6,9 +6,11 @@
  */
 
 #include "adc.h"
-
-
+#include "cdc.h"
+#include "usbd_cdc_if.h"
 #ifdef _USE_HW_ADC
+
+#define      ADC_BUF_SIZE	3648
 
 typedef struct
 {
@@ -20,7 +22,7 @@ typedef struct
 
 static adc_tbl_t adc_tbl[ADC_MAX_CH];
 
-static uint16_t  adc_buf[ADC_BUF_SIZE];
+static volatile uint16_t adc_buf[ADC_BUF_SIZE];
 
 ADC_HandleTypeDef hadc1;
 DMA_HandleTypeDef hdma_adc1;
@@ -62,28 +64,32 @@ void adcInit()
 	{
 	  Error_Handler ();
 	}
-    }
 
-  if (HAL_ADC_Start_DMA (&hadc1, (uint32_t*)&adc_buf, ADC_BUF_SIZE) != HAL_OK)
-    {
-      Error_Handler ();
-    }
+      adc_tbl[i].is_init     = true;
+      adc_tbl[i].hADCx       = &hadc1;
+      adc_tbl[i].adc_channel = ADC_CHANNEL_5;
 
+    }
 
 }
 
-
-
-
-void ADCstartDMA(uint8_t ch, uint32_t* buf, uint32_t len)
+void ADCstart_DMA(uint8_t ch)
 {
-  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_buf, ADC_BUF_SIZE);
+  HAL_ADC_Start_DMA (adc_tbl[ch].hADCx, (uint32_t*)&adc_buf, ADC_BUF_SIZE);
 }
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
+  //start bit[4bit]
+  uint8_t start_bit[4] = {0xFA, 0xFB, 0xFC, 0xFD};
+  CDC_Transmit_FS( (uint8_t*)start_bit, 4);
+  CDC_Transmit_FS( (uint8_t*)adc_buf, ADC_BUF_SIZE);
 
-
+  //end bit [4bit]
+  uint8_t end_bit[4] = {0xEA, 0xEB, 0xEC, 0xED};
+  CDC_Transmit_FS( (uint8_t*)end_bit, 4);
+  //crc?
+  //end bit [4bit]
 }
 
 void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)

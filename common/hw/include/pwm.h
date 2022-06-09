@@ -24,7 +24,8 @@ bool pwmStop(uint8_t ch);
 void pwmSycDelay(uint8_t ch, uint32_t delay);
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
-
+void CCDSingleShot();
+bool CCDset(uint32_t SH, uint32_t ICG);
 
 #endif
 
