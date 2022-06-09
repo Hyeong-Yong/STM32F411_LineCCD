@@ -16,6 +16,7 @@
 
 void adcInit(void);
 void ADCstart_DMA(uint8_t ch);
+void ADCstop_DMA(uint8_t ch);
 
 #endif
 

@@ -78,16 +78,40 @@ void ADCstart_DMA(uint8_t ch)
   HAL_ADC_Start_DMA (adc_tbl[ch].hADCx, (uint32_t*)&adc_buf, ADC_BUF_SIZE);
 }
 
+void ADCstop_DMA(uint8_t ch)
+{
+  HAL_ADC_Stop_DMA (adc_tbl[ch].hADCx);
+}
+
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
-  //start bit[4bit]
-  uint8_t start_bit[4] = {0xFA, 0xFB, 0xFC, 0xFD};
-  CDC_Transmit_FS( (uint8_t*)start_bit, 4);
-  CDC_Transmit_FS( (uint8_t*)adc_buf, ADC_BUF_SIZE);
+      uint8_t transfer_buf[4+(ADC_BUF_SIZE*2)];
 
-  //end bit [4bit]
-  uint8_t end_bit[4] = {0xEA, 0xEB, 0xEC, 0xED};
-  CDC_Transmit_FS( (uint8_t*)end_bit, 4);
+      //start bits[2bit]
+      transfer_buf[0]=0xFA;
+      transfer_buf[1]=0xFB;
+      uint32_t example =1000;
+      //data bits [ADC_BUF_SIZE *2]
+      for (int i =0 ; i< ADC_BUF_SIZE;i++)
+	{
+	  uint8_t bit_convert[2];
+	  bit_convert[0]= adc_buf[i] >>0;
+	  bit_convert[1]= adc_buf[i] >>8;
+	  transfer_buf[2+i*2] = bit_convert[0];
+	  transfer_buf[3+i*2] = bit_convert[1];
+	}
+
+      //end bits [2bit]
+      transfer_buf[2+(ADC_BUF_SIZE*2)] = 0xEB;
+      transfer_buf[3+(ADC_BUF_SIZE*2)] = 0xEA;
+
+      CDC_Transmit_FS( (uint8_t*)transfer_buf, 4+(ADC_BUF_SIZE*2));
+
+      //stop PWM and ADC
+      pwmStop(_DEF_PWM1); // ICG
+      pwmStop(_DEF_PWM3); // SH
+      ADCstop_DMA(_DEF_ADC1);
+
   //crc?
   //end bit [4bit]
 }

@@ -12,7 +12,7 @@
 
 void apInit(void)
 {
-  cliOpen(_DEF_UART2, 57600);
+  cliOpen(_DEF_UART2, 115200);
   st7735Init();
   gpioPinWrite(1, _DEF_HIGH);
 

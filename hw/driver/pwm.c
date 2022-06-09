@@ -6,6 +6,7 @@
  */
 
 #include "pwm.h"
+#include "adc.h"
 #include "cli.h"
 
 #ifdef _USE_HW_PWM
@@ -332,22 +333,18 @@ bool CCDset(uint32_t SH, uint32_t ICG)
 
 void CCDSingleShot()
 {
-  pwmBegin(_DEF_PWM1, current_ICG);
-  pwmBegin(_DEF_PWM3, current_SH);
-
   pwmStart(_DEF_PWM1);
   pwmSycDelay(_DEF_PWM1, 1);
   pwmStart(_DEF_PWM3);
-  delay(1);
-  pwmStop(_DEF_PWM1); // ICG
-  pwmStop(_DEF_PWM3); // SH
+  ADCstart_DMA(_DEF_ADC1);
+
 }
 
 
 void pwmSycDelay(uint8_t ch, uint32_t delay)
 {
   pwm_t* p_pwm = &pwm_tbl[ch];
-  // 1 clock is delayed when using function. To synchronize, add 1 clock
+  // 1 clock is delayed when using encapulated function. To synchronize, add 1 clock
   p_pwm->h_tim->Instance->CNT = delay+1;
 }
 
