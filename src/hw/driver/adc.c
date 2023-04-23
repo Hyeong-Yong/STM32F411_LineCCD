@@ -90,7 +90,6 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
       //start bits[2bit]
       transfer_buf[0]=0xFA;
       transfer_buf[1]=0xFB;
-      uint32_t example =1000;
       //data bits [ADC_BUF_SIZE *2]
       for (int i =0 ; i< ADC_BUF_SIZE;i++)
 	{
